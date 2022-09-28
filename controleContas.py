@@ -1,6 +1,7 @@
 # compilar usando
 # venv\Scripts\pyinstaller.exe -F --console -w --upx-dir=Z:\Christian\Python\GitHub\upx-3.96-win64\upx-3.96-win64 --distpath .\ --ico .\icone.ico --name "Coleção de Moedas 2022" .\colecao_moedas_2022.py
 
+from http.client import GONE
 from os import link
 from pprint import pprint
 import sys
@@ -25,6 +26,9 @@ class Novo(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         super().setupUi(self)
+
+        # oculta o botao pagar cartao
+        self.bt_cartao_2.setVisible(False)
 
         # alinhamento top no vertical layout
         self.verticalLayout.setAlignment(Qt.AlignTop)
@@ -71,11 +75,22 @@ class Novo(QMainWindow, Ui_MainWindow):
         self.actionReceber.triggered.connect(
             lambda: self.abrePesquisa("RECEBER", mes, ano))
 
+        # menu cartao
+        self.bt_cartao.clicked.connect(
+            lambda: self.abrePesquisa("PAGAR", mes, ano, cartao=True))
+
         # menu pagar
         self.bt_pagar.clicked.connect(
             lambda: self.abrePesquisa("PAGAR", mes, ano))
         self.actionPagar.triggered.connect(
             lambda: self.abrePesquisa("PAGAR", mes, ano))
+
+        # botao proximo mes
+        self.bt_prox.clicked.connect(
+            lambda: self.abrePesquisa("PAGAR", int(mes)+1, ano))
+        # botao proximo mes
+        self.bt_prox.clicked.connect(
+            lambda: self.abrePesquisa("PAGAR", int(mes)+1, ano))
 
         # botao salvar conta
         self.bt_salvar.clicked.connect(self.Cadastro)
@@ -98,31 +113,36 @@ class Novo(QMainWindow, Ui_MainWindow):
         return dia, mes, ano
 
     def abre_item_selecionado(self, item):
-        self.frame_cadastro.setVisible(True)
-        self.label.setText('Atualizar Conta')
-        id = str(item.text()).split(':')[1].strip()
-        id, conta, valor, parcela, ano, mes, dia, situacao, tipo, categoria = prog.listar_id(
-            id)
-        self.ed_conta.setText(conta)
-        self.ed_valor.setText(valor)
-        self.ed_parcela.setText(parcela)
-        self.ed_ano.setText(ano)
-        self.ed_mes.setText(mes)
-        self.ed_dia.setText(dia)
-        self.cb_situacao.setCurrentText(situacao)
-        self.cb_tipo.setCurrentText(tipo)
-        self.label_id.setText(str(id))
-        self.cb_categoria.setCurrentText(categoria)
-        self.bt_salvar.setText('Atualizar')
 
-    def abrePesquisa(self, tipo, mes=False, ano=False, anterior=False, proximo=True):
+        try:
+            id = str(item.text()).split(':')[1].strip()
+            id, conta, valor, parcela, ano, mes, dia, situacao, tipo, categoria = prog.listar_id(
+                id)
+            self.label.setText('Atualizar Conta')
+            self.frame_cadastro.setVisible(True)
+            self.ed_conta.setText(conta)
+            self.ed_valor.setText(valor)
+            self.ed_parcela.setText(parcela)
+            self.ed_ano.setText(ano)
+            self.ed_mes.setText(mes)
+            self.ed_dia.setText(dia)
+            self.cb_situacao.setCurrentText(situacao)
+            self.cb_tipo.setCurrentText(tipo)
+            self.label_id.setText(str(id))
+            self.cb_categoria.setCurrentText(categoria)
+            self.bt_salvar.setText('Atualizar')
+        except:
+            self.frame_cadastro.setVisible(False)
+
+    def abrePesquisa(self, tipo, mes=False, ano=False, anterior=False, proximo=True, cartao=False):
         self.frame_listagem.setVisible(True)
         self.frame_cadastro.setVisible(False)
 
         resumo = prog.exibeResumo(mes, ano)
         self.label_resumo.setText(resumo)
 
-        itens = prog.buscar_tipos(vtipo=tipo, vmes=str(mes), vano=str(ano))
+        itens = prog.buscar_tipos(vtipo=tipo, vmes=str(
+            mes), vano=str(ano), credito=cartao)
         self.list_item.clear()
         self.cb_tipo_pesquisa.setCurrentText(tipo)
 
@@ -177,6 +197,8 @@ class Novo(QMainWindow, Ui_MainWindow):
 
         resumo = prog.exibeResumo(mes, ano)
         self.label_resumo.setText(resumo)
+
+        self.abrePesquisa(tipo, mes, ano)
 
         if retorno:
             QMessageBox.information(

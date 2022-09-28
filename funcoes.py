@@ -67,10 +67,13 @@ class Contas:
         for linha in self.cursor.fetchall():
             return linha
 
-    def buscar_tipos(self, vtipo, vmes, vano):
+    def buscar_tipos(self, vtipo, vmes, vano, credito=False):
         # if termo == 'pagar':
         # WHERE tipo LIKE ? AND ano LIKE ? AND mes LIKE ?  ORDER BY dia"
-        sql = "SELECT * FROM contas WHERE tipo LIKE ? and mes LIKE ? and ano  LIKE ? order by dia"
+        if credito:
+            sql = "SELECT * FROM contas WHERE tipo LIKE ? and mes LIKE ? and ano  LIKE ? and categoria = 'CARTAO' order by dia"
+        else:
+            sql = "SELECT * FROM contas WHERE tipo LIKE ? and mes LIKE ? and ano  LIKE ? and categoria != 'CARTAO' order by dia"
         self.cursor.execute(sql, (vtipo, vmes, vano))
         # , '2022', '09'
 
@@ -81,6 +84,7 @@ class Contas:
             id = str(linha[0]) + ':'
             conta = linha[1]
             valor = linha[2]
+
             parcela = linha[3]
             ano = linha[4]
             mes = linha[5]
@@ -89,8 +93,17 @@ class Contas:
             tipo = linha[8]
             categoria = linha[9]
 
-            retorno.append(f'{conta: <30} \t{str(categoria): <20}\t\t {str(parcela): <10} \tR${str(valor): <10} \t{str(dia)}-{str(mes)}-{str(ano)} \t{situacao}\t\t\t:{str(id)}'
+            retorno.append(f'{conta: <33} \t{str(categoria): <20}\t\t {str(parcela): <10} \tR${valor: <10} \t{str(dia)}-{str(mes)}-{str(ano)} \t{situacao}\t\t\t:{str(id)}'
                            )
+        sql = f'Select sum(valor) from Contas where tipo == "PAGAR" and mes == "{vmes}" and ano == "{vano}" and categoria=="CARTAO"'
+        self.cursor.execute(sql)
+        for linha in self.cursor.fetchall():
+            total_cartao = linha[0]
+
+        if total_cartao and vtipo == 'PAGAR':
+
+            retorno.append(
+                f'CARTÃO DE CRÉDITO\t\t\t\t\t\tR${round(total_cartao,2)}')
         return retorno
 
     def exibeResumo(self, mes, ano):
@@ -110,16 +123,33 @@ class Contas:
         self.cursor.execute(sql)
         for linha in self.cursor.fetchall():
             total_a_pagar = linha[0]
+        sql = f'Select sum(valor) from Contas where tipo == "PAGAR" and mes == "{mes}" and ano == "{ano}" and categoria=="CARTAO"'
+        self.cursor.execute(sql)
+        for linha in self.cursor.fetchall():
+            total_cartao = linha[0]
+
         if not total_a_pagar:
             total_a_pagar = "0,00"
+        else:
+            total_a_pagar = round(total_a_pagar, 2)
         if not total_pagar:
             total_pagar = "0,00"
+        else:
+            total_pagar = round(total_pagar, 2)
         if not total_pago:
             total_pago = "0,00"
+        else:
+            total_pago = round(total_pago, 2)
         if not total_receber:
             total_receber = "0,00"
+        else:
+            total_receber = round(total_receber, 2)
+        if not total_cartao:
+            total_cartao = "0,00"
+        else:
+            total_cartao = round(total_cartao, 2)
 
-        return f'Resumo do Mês {mes}/{ano}\n\nTotal a receber R${total_receber}\nTotal a pagar R${total_pagar}\nTotal pago R${total_pago}\nFalta pagar R${total_a_pagar}\n'
+        return f'Resumo do Mês {mes}/{ano}\n\nTotal a receber R${total_receber}\nTotal a pagar R${total_pagar}\nTotal Cartão Crédito R${total_cartao}\nTotal pago R${total_pago}\nFalta pagar R${total_a_pagar}\n'
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/adming/python/python_contas/layout.ui'
+# Form implementation generated from reading ui file 'd:\Python Projects\Github\python_contas\layout.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.7
 #
@@ -63,7 +63,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.horizontalLayout_9)
         self.frame_cadastro = QtWidgets.QFrame(self.centralwidget)
         self.frame_cadastro.setMaximumSize(QtCore.QSize(16777215, 200))
-        self.frame_cadastro.setStyleSheet("background-color: rgb(85, 170, 255);")
+        self.frame_cadastro.setStyleSheet("")
         self.frame_cadastro.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_cadastro.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_cadastro.setObjectName("frame_cadastro")
@@ -235,7 +235,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addLayout(self.horizontalLayout_10, 3, 0, 1, 1)
         self.verticalLayout.addWidget(self.frame_cadastro)
         self.frame_listagem = QtWidgets.QFrame(self.centralwidget)
-        self.frame_listagem.setStyleSheet("background-color: rgb(255, 170, 127);")
+        self.frame_listagem.setStyleSheet("")
         self.frame_listagem.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_listagem.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_listagem.setObjectName("frame_listagem")
@@ -245,6 +245,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(14)
         self.list_item.setFont(font)
+        self.list_item.setStyleSheet("")
         self.list_item.setObjectName("list_item")
         self.gridLayout.addWidget(self.list_item, 2, 0, 1, 3)
         self.horizontalLayout_11 = QtWidgets.QHBoxLayout()
@@ -349,7 +350,7 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addLayout(self.verticalLayout, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1100, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1100, 21))
         self.menubar.setObjectName("menubar")
         self.menuMenu = QtWidgets.QMenu(self.menubar)
         self.menuMenu.setObjectName("menuMenu")

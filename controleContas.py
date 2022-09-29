@@ -71,26 +71,30 @@ class Novo(QMainWindow, Ui_MainWindow):
 
         # menu receber
         self.bt_receber.clicked.connect(
-            lambda: self.abrePesquisa("RECEBER", mes, ano))
+            lambda: self.abrePesquisa("RECEBER", int(self.cb_mes.currentText()), int(self.cb_ano.currentText())))
         self.actionReceber.triggered.connect(
-            lambda: self.abrePesquisa("RECEBER", mes, ano))
+            lambda: self.abrePesquisa("RECEBER", int(self.cb_mes.currentText()), int(self.cb_ano.currentText())))
 
         # menu cartao
         self.bt_cartao.clicked.connect(
-            lambda: self.abrePesquisa("PAGAR", mes, ano, cartao=True))
+            lambda: self.abrePesquisa("PAGAR", int(self.cb_mes.currentText()), int(self.cb_ano.currentText()), cartao=True))
+
+        # botao pagar cartao
+        self.bt_cartao_2.clicked.connect(lambda: self.pagarCartao(
+            int(self.cb_mes.currentText()), int(self.cb_ano.currentText())))
 
         # menu pagar
         self.bt_pagar.clicked.connect(
-            lambda: self.abrePesquisa("PAGAR", mes, ano))
+            lambda: self.abrePesquisa("PAGAR", int(self.cb_mes.currentText()), int(self.cb_ano.currentText())))
         self.actionPagar.triggered.connect(
-            lambda: self.abrePesquisa("PAGAR", mes, ano))
+            lambda: self.abrePesquisa("PAGAR", int(self.cb_mes.currentText()), int(self.cb_ano.currentText())))
 
         # botao proximo mes
         self.bt_prox.clicked.connect(
-            lambda: self.abrePesquisa("PAGAR", int(mes)+1, ano))
-        # botao proximo mes
-        self.bt_prox.clicked.connect(
-            lambda: self.abrePesquisa("PAGAR", int(mes)+1, ano))
+            lambda: self.abrePesquisa(self.cb_tipo_pesquisa.currentText(), int(self.cb_mes.currentText()), int(self.cb_ano.currentText()), proximo=True))
+        # botao anterior mes
+        self.bt_ant.clicked.connect(
+            lambda: self.abrePesquisa(self.cb_tipo_pesquisa.currentText(), int(self.cb_mes.currentText()), int(self.cb_ano.currentText()), anterior=True))
 
         # botao salvar conta
         self.bt_salvar.clicked.connect(self.Cadastro)
@@ -111,6 +115,16 @@ class Novo(QMainWindow, Ui_MainWindow):
         self.cb_mes.setCurrentText(str(mes))
         self.cb_ano.setCurrentText(str(ano))
         return dia, mes, ano
+
+    def pagarCartao(self, mes, ano):
+        self.bt_cartao_2.setVisible(False)
+        retorno = prog.pagarCartao(mes, ano)
+        if retorno:
+            QMessageBox.information(
+                self, 'Cadastro', f'Cadastro realizado com sucesso!')
+        else:
+            QMessageBox.warning(
+                self, 'Cadastro', f'Houve um erro ao realizar o cadastro!')
 
     def abre_item_selecionado(self, item):
 
@@ -134,7 +148,27 @@ class Novo(QMainWindow, Ui_MainWindow):
         except:
             self.frame_cadastro.setVisible(False)
 
-    def abrePesquisa(self, tipo, mes=False, ano=False, anterior=False, proximo=True, cartao=False):
+    def abrePesquisa(self, tipo, mes=False, ano=False, anterior=False, proximo=False, cartao=False):
+
+        if proximo:
+            if int(mes) + 1 == 13:
+                mes = str(1)
+                ano = str(int(ano)+1)
+                self.cb_ano.setCurrentText(ano)
+                self.cb_mes.setCurrentText(mes)
+            else:
+                mes = str(int(mes)+1)
+                self.cb_mes.setCurrentText(mes)
+        if anterior:
+            if int(mes) - 1 == 0:
+                mes = str(12)
+                ano = str(int(ano)-1)
+                self.cb_ano.setCurrentText(ano)
+                self.cb_mes.setCurrentText(mes)
+            else:
+                mes = str(int(mes)-1)
+                self.cb_mes.setCurrentText(mes)
+
         self.frame_listagem.setVisible(True)
         self.frame_cadastro.setVisible(False)
 
@@ -149,6 +183,20 @@ class Novo(QMainWindow, Ui_MainWindow):
         try:
             for item in itens:
                 self.list_item.addItem(item)
+                if tipo == "PAGAR":
+                    self.list_item.setStyleSheet(
+                        "QListWidget {background-color: rgb(255,160,122)}")
+                elif tipo == "RECEBER":
+                    self.list_item.setStyleSheet(
+                        "QListWidget {background-color: rgb(0,255,127)}")
+                if cartao:
+                    self.bt_cartao_2.setVisible(True)
+                    self.list_item.setStyleSheet(
+                        "QListWidget {background-color: rgb(240,230,140)}")
+
+                else:
+                    self.bt_cartao_2.setVisible(False)
+
             if self.list_item.count() == 0:
                 self.list_item.clear()
                 self.list_item.addItem('Nenhum item encontrado')

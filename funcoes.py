@@ -50,6 +50,15 @@ class Contas:
         except:
             return False
 
+    def pagarCartao(self, ano, mes):
+        try:
+            sql = "UPDATE Contas SET situacao='PAGO' WHERE mes=? and ano=? and categoria='CARTAO'"
+            self.cursor.execute(sql, (str(mes).upper(), str(ano).upper()))
+            self.conn.commit()
+            return True
+        except:
+            return False
+
     def remover(self, id):
         sql = "DELETE FROM Contas WHERE id=?"
         self.cursor.execute(sql, (id,))
@@ -100,7 +109,7 @@ class Contas:
         for linha in self.cursor.fetchall():
             total_cartao = linha[0]
 
-        if total_cartao and vtipo == 'PAGAR':
+        if total_cartao and vtipo == 'PAGAR' and not credito:
 
             retorno.append(
                 f'CARTÃO DE CRÉDITO\t\t\t\t\t\tR${round(total_cartao,2)}')
@@ -129,23 +138,23 @@ class Contas:
             total_cartao = linha[0]
 
         if not total_a_pagar:
-            total_a_pagar = "0,00"
+            total_a_pagar = "0.00"
         else:
             total_a_pagar = round(total_a_pagar, 2)
         if not total_pagar:
-            total_pagar = "0,00"
+            total_pagar = "0.00"
         else:
             total_pagar = round(total_pagar, 2)
         if not total_pago:
-            total_pago = "0,00"
+            total_pago = "0.00"
         else:
             total_pago = round(total_pago, 2)
         if not total_receber:
-            total_receber = "0,00"
+            total_receber = "0.00"
         else:
             total_receber = round(total_receber, 2)
         if not total_cartao:
-            total_cartao = "0,00"
+            total_cartao = "0.00"
         else:
             total_cartao = round(total_cartao, 2)
 

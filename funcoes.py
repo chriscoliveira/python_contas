@@ -3,6 +3,9 @@ from playwright.sync_api import sync_playwright
 from time import sleep
 import os
 from bs4 import BeautifulSoup
+from matplotlib import pyplot as plt
+import numpy as np
+
 #  C:\Users\Christian\AppData\Roaming\Python\Python310\Scripts\pyuic5 .\layout.ui -o .\layout.py
 
 
@@ -106,6 +109,7 @@ class Contas:
                            )
         sql = f'Select sum(valor) from Contas where tipo == "PAGAR" and mes == "{vmes}" and ano == "{vano}" and categoria=="CARTAO"'
         self.cursor.execute(sql)
+
         for linha in self.cursor.fetchall():
             total_cartao = linha[0]
 
@@ -113,6 +117,7 @@ class Contas:
 
             retorno.append(
                 f'CARTÃO DE CRÉDITO\t\t\t\t\t\tR${round(total_cartao,2)}')
+
         return retorno
 
     def exibeResumo(self, mes, ano):
@@ -157,6 +162,43 @@ class Contas:
             total_cartao = "0.00"
         else:
             total_cartao = round(total_cartao, 2)
+
+        # # gera o grafico
+        # cars = ['RECEBER', 'PAGAR']
+
+        # data = [total_receber, total_pagar]
+        # fig = plt.figure(figsize=(10, 7))
+        # plt.title(f'Gráfico de {mes}/{ano}')
+        # plt.pie(data, labels=cars)
+        # plt.savefig('grafico.jpg')
+        try:
+            os.remove('grafico.jpg')
+            print('removido')
+        except:
+            pass
+
+        # Pie chart
+        labels = ['RECEBER', 'PAGAR']
+        sizes = [total_receber, total_pagar]
+        # colors
+        colors = ['#66b3ff', '#ff9999']
+        # explsion
+        explode = (0.05, 0.05)
+
+        plt.pie(sizes, colors=colors, autopct='%1.1f%%',
+                startangle=90, pctdistance=0.85, explode=explode)
+
+        # draw circle
+        # centre_circle = plt.Circle((0, 0), 0.70, fc='white')
+        fig = plt.gcf()
+        # fig.gca().add_artist(centre_circle)
+        # Equal aspect ratio ensures that pie is drawn as a circle
+        # ax1.axis('equal')
+        plt.rcParams.update({'font.size': 16})
+        plt.tight_layout()
+
+        plt.savefig('grafico.png', transparent=True)
+        plt.close()
 
         return f'Resumo do Mês {mes}/{ano}\n\nTotal a receber R${total_receber}\nTotal a pagar R${total_pagar}\nTotal Cartão Crédito R${total_cartao}\nTotal pago R${total_pago}\nFalta pagar R${total_a_pagar}\n'
 

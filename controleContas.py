@@ -18,6 +18,8 @@ import urllib
 from funcoes import Contas
 from PyQt5.QtWidgets import QMainWindow, QApplication
 import os
+from matplotlib import pyplot as plt
+import numpy as np
 
 prog = Contas('db_contas.db')
 
@@ -173,6 +175,11 @@ class Novo(QMainWindow, Ui_MainWindow):
         self.frame_cadastro.setVisible(False)
 
         resumo = prog.exibeResumo(mes, ano)
+
+        pixmap = QPixmap('grafico.png')
+        pixmap = pixmap.scaled(460, 380, QtCore.Qt.KeepAspectRatio)
+        self.grafico.setPixmap(pixmap)
+
         self.label_resumo.setText(resumo)
 
         itens = prog.buscar_tipos(vtipo=tipo, vmes=str(
